@@ -1,4 +1,5 @@
 using eAgenda.Infraestrutura.Arquivos;
+using eAgenda.Infraestrutura.Orm;
 
 namespace eAgenda.WebApp;
 
@@ -8,8 +9,8 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        
-        builder.Services.AddCamadaInfraestruturaEmArquivo();
+        // Add services to the container.
+        builder.Services.AddCamadaInfraestruturaEmOrm(builder.Configuration);
 
         builder.Services.AddControllersWithViews();
 
