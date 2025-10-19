@@ -18,6 +18,17 @@ using System.Threading.Tasks;
 
 namespace eAgenda.Infraestrutura.Orm
 {
+
+    public static class AppDbContextFactory
+    {
+        public static AppDbContext CriarDbContext(string connectionString)
+        {
+            var builder = new DbContextOptionsBuilder<AppDbContext>()
+                .UseSqlServer(connectionString, options => options.EnableRetryOnFailure(3));
+
+            return new AppDbContext(builder.Options);
+        }
+    }
     public class AppDbContext(DbContextOptions options) : DbContext(options)
     {
         public DbSet<Contato> Contatos { get; set; }
