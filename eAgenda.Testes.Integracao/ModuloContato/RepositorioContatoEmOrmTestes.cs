@@ -33,7 +33,7 @@ namespace eAgenda.Testes.Integracao
         public void Deve_RetornarNulo_Ao_SelecionarRegistroPoId_ComIdErrado()
         {
             Contato contato = new Contato(
-                "Julio Teste",
+               "Julio Teste",
                 "(49) 98533-3334",
                 "julio@email.com",
                 "Academia do Programador",
@@ -46,6 +46,61 @@ namespace eAgenda.Testes.Integracao
 
             // Asserção
             Assert.AreNotEqual(contato, contatoSelecionado);
+        }
+
+        [TestMethod]
+        public void Deve_EditarRegistro_ComSucesso()
+        {
+            // Padrão AAA
+            // Arranjo
+            Contato contatoOriginal = new Contato(
+               "Julio Teste",
+                "(49) 98533-3334",
+                "julio@email.com",
+                "Academia do Programador",
+                "Testador"
+            );
+
+            repositorioContato.CadastrarRegistro(contatoOriginal);
+
+            Contato contatoEditado = new Contato(
+                "Julio Teste-edit",
+                "(49) 98533-3334",
+                "julio@email.com",
+                "Academia do Programador",
+                "Testador"
+            );
+
+            
+            repositorioContato.EditarRegistro(contatoOriginal.Id, contatoEditado);
+
+            
+            Contato? contatoSelecionado = repositorioContato.SelecionarRegistroPorId(contatoOriginal.Id);
+
+            Assert.AreEqual(contatoOriginal, contatoSelecionado);
+        }
+
+        [TestMethod]
+        public void Deve_ExcluirRegistro_ComSucesso()
+        {
+            // Arranjo
+            Contato contatoOriginal = new Contato(
+                "Julio Teste",
+                "(49) 98533-3334",
+                "julio@email.com",
+                "Academia do Programador",
+                "Testador"
+            );
+
+            repositorioContato.CadastrarRegistro(contatoOriginal);
+
+            // Ação
+            repositorioContato.ExcluirRegistro(contatoOriginal.Id);
+
+            // Asserção
+            Contato? contatoSelecionado = repositorioContato.SelecionarRegistroPorId(contatoOriginal.Id);
+
+            Assert.IsNull(contatoSelecionado);
         }
     }
 }
