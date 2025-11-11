@@ -7,8 +7,22 @@ namespace eAgenda.Testes.Integracao
     [TestClass]
     public sealed class RepositorioContatoEmOrmTestes
     {
-        private static readonly AppDbContext dbContext = AppDbContextFactory.CriarDbContext("Data Source=(LocalDB)\\MSSQLLocalDB;Initial Catalog=eAgendaDb;Integrated Security=True");
-        private static RepositorioContatoEmOrm repositorioContato = new RepositorioContatoEmOrm(dbContext);
+        private static readonly AppDbContext dbContext = AppDbContextFactory.CriarDbContext("Data Source=(LocalDB)\\MSSQLLocalDB;Initial Catalog=eAgendaTestDb;Integrated Security=True");
+        private static readonly RepositorioContatoEmOrm repositorioContato = new RepositorioContatoEmOrm(dbContext);
+
+        [TestInitialize]
+        public void ConfigurarTestes()
+        {
+            dbContext.Database.EnsureCreated();
+
+            dbContext.Tarefas.RemoveRange(dbContext.Tarefas);
+            dbContext.Despesas.RemoveRange(dbContext.Despesas);
+            dbContext.Categorias.RemoveRange(dbContext.Categorias);
+            dbContext.Compromissos.RemoveRange(dbContext.Compromissos);
+            dbContext.Contatos.RemoveRange(dbContext.Contatos);
+
+            dbContext.SaveChanges();
+        }
 
         [TestMethod]
         public void Deve_CadastrarRegistro_ComSucesso()
@@ -71,12 +85,13 @@ namespace eAgenda.Testes.Integracao
                 "Testador"
             );
 
-            
-            repositorioContato.EditarRegistro(contatoOriginal.Id, contatoEditado);
 
-            
+            bool registroEditado = repositorioContato.EditarRegistro(contatoOriginal.Id, contatoEditado);
+
+
             Contato? contatoSelecionado = repositorioContato.SelecionarRegistroPorId(contatoOriginal.Id);
 
+            Assert.IsTrue(registroEditado);
             Assert.AreEqual(contatoOriginal, contatoSelecionado);
         }
 
@@ -92,7 +107,7 @@ namespace eAgenda.Testes.Integracao
                 "Testador"
             );
 
-            repositorioContato.CadastrarRegistro(contatoOriginal);
+            bool registroExcluido = repositorioContato.ExcluirRegistro(contatoOriginal.Id);
 
             // Ação
             repositorioContato.ExcluirRegistro(contatoOriginal.Id);
@@ -100,6 +115,7 @@ namespace eAgenda.Testes.Integracao
             // Asserção
             Contato? contatoSelecionado = repositorioContato.SelecionarRegistroPorId(contatoOriginal.Id);
 
+            Assert.IsTrue(registroExcluido);
             Assert.IsNull(contatoSelecionado);
         }
     }
