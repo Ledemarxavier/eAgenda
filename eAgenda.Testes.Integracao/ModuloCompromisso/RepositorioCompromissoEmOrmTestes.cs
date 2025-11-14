@@ -72,6 +72,86 @@ namespace eAgenda.Testes.Integracao.ModuloCompromisso
             Compromisso? compromissoSelecionado = repositorioCompromisso?.SelecionarRegistroPorId(compromisso.Id);
 
             Assert.AreEqual(compromisso, compromissoSelecionado);
+
+        }
+
+        [TestMethod]
+        public void Deve_EditarRegistro_ComSucesso()
+        {
+            // Arranjo
+            Contato contato = Builder<Contato>
+                .CreateNew()
+                .Build();
+
+            TimeSpan horaInicio = DateTime.Now.TimeOfDay;
+            TimeSpan horaTermino = horaInicio.Add(TimeSpan.FromHours(2));
+
+            Compromisso compromisso = new Compromisso(
+                "Reunião",
+                DateTime.Now,
+                horaInicio,
+                horaTermino,
+                TipoCompromisso.Remoto,
+                "meet.com",
+                null,
+                contato
+            );
+
+            repositorioCompromisso?.CadastrarRegistro(compromisso);
+
+            Compromisso compromissoEditado = new Compromisso(
+                "Reunião Edit",
+                DateTime.Now,
+                horaInicio,
+                horaTermino,
+                TipoCompromisso.Presencial,
+                null,
+                "MicroLages",
+                contato
+            );
+
+            // Ação
+            bool? registroEditado = repositorioCompromisso?.EditarRegistro(compromisso.Id, compromissoEditado);
+
+            // Asserção
+            Compromisso? compromissoSelecionado = repositorioCompromisso?.SelecionarRegistroPorId(compromisso.Id);
+
+            Assert.IsTrue(registroEditado);
+            Assert.AreEqual(compromisso, compromissoSelecionado);
+        }
+
+        [TestMethod]
+        public void Deve_ExcluirRegistro_ComSucesso()
+        {
+            // Arranjo
+            Contato contato = Builder<Contato>
+                .CreateNew()
+                .Build();
+
+            TimeSpan horaInicio = DateTime.Now.TimeOfDay;
+            TimeSpan horaTermino = horaInicio.Add(TimeSpan.FromHours(2));
+
+            Compromisso compromisso = new Compromisso(
+                "Reunião",
+                DateTime.Now,
+                horaInicio,
+                horaTermino,
+                TipoCompromisso.Remoto,
+                "meet.com",
+                null,
+                contato
+            );
+
+            repositorioCompromisso?.CadastrarRegistro(compromisso);
+
+            // Ação
+            bool? registroExcluido = repositorioCompromisso?.ExcluirRegistro(compromisso.Id);
+
+            // Asserção
+            Compromisso? compromissoSelecionado = repositorioCompromisso?.SelecionarRegistroPorId(compromisso.Id);
+
+            Assert.IsTrue(registroExcluido);
+            Assert.IsNull(compromissoSelecionado);
         }
     }
 }
