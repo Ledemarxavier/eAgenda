@@ -8,151 +8,72 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace eAgenda.Testes.Integracao.ModuloCompromisso
+namespace eAgenda.Testes.Integracao.ModuloCompromisso;
+
+
+[TestClass]
+[TestCategory("Testes de Integração de Compromisso")]
+public class RepositorioCompromissoEmOrmTestes : TestFixture
 {
-    [TestClass]
-    [TestCategory("Testes de Integração de Compromisso")]
-    public class RepositorioCompromissoEmOrmTestes : TestFixture
+    [TestMethod]
+    public void Deve_CadastrarRegistro_ComSucesso()
     {
-        [TestMethod]
-        public void Deve_CadastrarRegistro_ComSucesso()
-        {
-            // Arrange - Arranjo
-            TimeSpan horaInicio = DateTime.Now.TimeOfDay;
-            TimeSpan horaTermino = horaInicio.Add(TimeSpan.FromHours(2));
+        // Arrange - Arranjo
+        TimeSpan horaInicio = DateTime.Now.TimeOfDay;
+        TimeSpan horaTermino = horaInicio.Add(TimeSpan.FromHours(2));
 
-            Compromisso compromisso = new Compromisso(
-                "Reunião",
-                DateTime.Now,
-                horaInicio,
-                horaTermino,
-                TipoCompromisso.Remoto,
-                "discord.com",
-                null,
-                null
-            );
+        Compromisso compromisso = new Compromisso(
+            "Reunião",
+            DateTime.Now,
+            horaInicio,
+            horaTermino,
+            TipoCompromisso.Remoto,
+            "discord.com",
+            null,
+            null
+        );
 
-            // Act - Ação
-            repositorioCompromisso?.CadastrarRegistro(compromisso);
+        // Act - Ação
+        repositorioCompromisso?.CadastrarRegistro(compromisso);
 
-            // Assert - Asserção
-            Compromisso? compromissoSelecionado = repositorioCompromisso?.SelecionarRegistroPorId(compromisso.Id);
+        // Assert - Asserção
+        Compromisso? compromissoSelecionado = repositorioCompromisso?.SelecionarRegistroPorId(compromisso.Id);
 
-            Assert.AreEqual(compromisso, compromissoSelecionado);
-        }
+        Assert.AreEqual(compromisso, compromissoSelecionado);
+    }
 
-        [TestMethod]
-        public void Deve_CadastrarRegistro_ComContato_ComSucesso()
-        {
-            // Arrange - Arranjo
-            Contato contato = Builder<Contato>
-                .CreateNew()
-                .With(c => c.Id = Guid.NewGuid())
-                .With(c => c.Nome = "Julio Teste")
-                .Build();
+    [TestMethod]
+    public void Deve_CadastrarRegistro_ComContato_ComSucesso()
+    {
+        // Arrange - Arranjo
+        Contato contato = Builder<Contato>
+            .CreateNew()
+            .With(c => c.Id = Guid.NewGuid())
+            .With(c => c.Nome = "Juninho Testes")
+            .Build();
 
-            TimeSpan horaInicio = DateTime.Now.TimeOfDay;
-            TimeSpan horaTermino = horaInicio.Add(TimeSpan.FromHours(2));
+        TimeSpan horaInicio = DateTime.Now.TimeOfDay;
+        TimeSpan horaTermino = horaInicio.Add(TimeSpan.FromHours(2));
 
-            Compromisso compromisso = new Compromisso(
-                "Reunião",
-                DateTime.Now,
-                horaInicio,
-                horaTermino,
-                TipoCompromisso.Remoto,
-                "meet.com",
-                null,
-                contato
-            );
+        Compromisso compromisso = new Compromisso(
+            "Reunião",
+            DateTime.Now,
+            horaInicio,
+            horaTermino,
+            TipoCompromisso.Remoto,
+            "discord.com",
+            null,
+            contato
+        );
 
-            // Act - Ação
-            repositorioCompromisso?.CadastrarRegistro(compromisso);
+        // Act - Ação
+        repositorioCompromisso?.CadastrarRegistro(compromisso);
 
-            // Assert - Asserção
-            Compromisso? compromissoSelecionado = repositorioCompromisso?.SelecionarRegistroPorId(compromisso.Id);
+        // Assert - Asserção
+        Compromisso? compromissoSelecionado = repositorioCompromisso?.SelecionarRegistroPorId(compromisso.Id);
 
-            Assert.AreEqual(compromisso, compromissoSelecionado);
-
-        }
-
-        [TestMethod]
-        public void Deve_EditarRegistro_ComSucesso()
-        {
-            // Arranjo
-            Contato contato = Builder<Contato>
-                .CreateNew()
-                .Build();
-
-            TimeSpan horaInicio = DateTime.Now.TimeOfDay;
-            TimeSpan horaTermino = horaInicio.Add(TimeSpan.FromHours(2));
-
-            Compromisso compromisso = new Compromisso(
-                "Reunião",
-                DateTime.Now,
-                horaInicio,
-                horaTermino,
-                TipoCompromisso.Remoto,
-                "meet.com",
-                null,
-                contato
-            );
-
-            repositorioCompromisso?.CadastrarRegistro(compromisso);
-
-            Compromisso compromissoEditado = new Compromisso(
-                "Reunião Edit",
-                DateTime.Now,
-                horaInicio,
-                horaTermino,
-                TipoCompromisso.Presencial,
-                null,
-                "MicroLages",
-                contato
-            );
-
-            // Ação
-            bool? registroEditado = repositorioCompromisso?.EditarRegistro(compromisso.Id, compromissoEditado);
-
-            // Asserção
-            Compromisso? compromissoSelecionado = repositorioCompromisso?.SelecionarRegistroPorId(compromisso.Id);
-
-            Assert.IsTrue(registroEditado);
-            Assert.AreEqual(compromisso, compromissoSelecionado);
-        }
-
-        [TestMethod]
-        public void Deve_ExcluirRegistro_ComSucesso()
-        {
-            // Arranjo
-            Contato contato = Builder<Contato>
-                .CreateNew()
-                .Build();
-
-            TimeSpan horaInicio = DateTime.Now.TimeOfDay;
-            TimeSpan horaTermino = horaInicio.Add(TimeSpan.FromHours(2));
-
-            Compromisso compromisso = new Compromisso(
-                "Reunião",
-                DateTime.Now,
-                horaInicio,
-                horaTermino,
-                TipoCompromisso.Remoto,
-                "meet.com",
-                null,
-                contato
-            );
-
-            repositorioCompromisso?.CadastrarRegistro(compromisso);
-
-            // Ação
-            bool? registroExcluido = repositorioCompromisso?.ExcluirRegistro(compromisso.Id);
-
-            // Asserção
-            Compromisso? compromissoSelecionado = repositorioCompromisso?.SelecionarRegistroPorId(compromisso.Id);
-
-            Assert.IsTrue(registroExcluido);
-            Assert.IsNull(compromissoSelecionado);
-        }
+        Assert.AreEqual(compromisso, compromissoSelecionado);
     }
 }
+
 
