@@ -5,19 +5,14 @@ using eAgenda.Infraestrutura.Orm.ModuloContato;
 using eAgenda.Infraestrutura.Orm.ModuloDespesa;
 using eAgenda.Infraestrutura.Orm.ModuloTarefa;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace eAgenda.Testes.Integracao.Compartilhado
 {
     [TestClass]
     public abstract class TestFixture
     {
-        private AppDbContext? dbContext;
+        protected AppDbContext? dbContext;
 
         protected RepositorioContatoEmOrm? repositorioContato;
         protected RepositorioCompromissoEmOrm? repositorioCompromisso;
