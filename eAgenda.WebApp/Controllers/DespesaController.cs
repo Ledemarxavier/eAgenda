@@ -1,24 +1,30 @@
-﻿using eAgenda.Dominio.ModuloCategoria;
+﻿using eAgenda.Dominio.ModuloAutenticacao;
+using eAgenda.Dominio.ModuloCategoria;
 using eAgenda.Dominio.ModuloDespesa;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using static eAgenda.WebApp.Models.DespesaViewModels;
 
 namespace eAgenda.WebApp.Controllers
 {
+    [Authorize]
     [Route("despesas")]
     public class DespesaController : Controller
     {
         private readonly IRepositorioDespesa repositorioDespesa;
         private readonly IRepositorioCategoria repositorioCategoria;
+        private readonly ITenantProvider tenantProvider;
 
         public DespesaController(
             IRepositorioDespesa repositorioDespesa,
-            IRepositorioCategoria repositorioCategoria
+            IRepositorioCategoria repositorioCategoria,
+            ITenantProvider tenantProvider
         )
         {
             this.repositorioDespesa = repositorioDespesa;
             this.repositorioCategoria = repositorioCategoria;
+            this.tenantProvider = tenantProvider;
         }
 
         [HttpGet]
@@ -65,6 +71,8 @@ namespace eAgenda.WebApp.Controllers
                 cadastrarVM.DataOcorrencia,
                 cadastrarVM.FormaPagamento
             );
+
+            despesa.UsuarioId = tenantProvider.UsuarioId.GetValueOrDefault();
 
             var categoriasSelecionadas = cadastrarVM.CategoriasSelecionadas;
 

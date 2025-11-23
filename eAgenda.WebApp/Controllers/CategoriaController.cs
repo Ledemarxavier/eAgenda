@@ -1,17 +1,23 @@
-﻿using eAgenda.Dominio.ModuloCategoria;
+﻿using eAgenda.Dominio.ModuloAutenticacao;
+using eAgenda.Dominio.ModuloCategoria;
 using eAgenda.WebApp.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace eAgenda.WebApp.Controllers
 {
+    [Authorize]
     [Route("categorias")]
     public class CategoriaController : Controller
     {
         private readonly IRepositorioCategoria repositorioCategoria;
+        private readonly ITenantProvider tenantProvider;
 
-        public CategoriaController(IRepositorioCategoria repositorioCategoria)
+        public CategoriaController(IRepositorioCategoria repositorioCategoria, ITenantProvider tenantProvider)
         {
             this.repositorioCategoria = repositorioCategoria;
+            this.tenantProvider = tenantProvider;
         }
 
         [HttpGet]
@@ -48,6 +54,8 @@ namespace eAgenda.WebApp.Controllers
             }
 
             var entidade = new Categoria(cadastrarVM.Titulo);
+
+            entidade.UsuarioId = tenantProvider.UsuarioId.GetValueOrDefault();
 
             repositorioCategoria.CadastrarRegistro(entidade);
 

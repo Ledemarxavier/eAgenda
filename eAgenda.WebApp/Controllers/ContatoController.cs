@@ -1,17 +1,22 @@
-﻿using eAgenda.Dominio.ModuloContato;
+﻿using eAgenda.Dominio.ModuloAutenticacao;
+using eAgenda.Dominio.ModuloContato;
 using eAgenda.WebApp.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace eAgenda.WebApp.Controllers
 {
+    [Authorize]
     [Route("contatos")]
     public class ContatoController : Controller
     {
         private readonly IRepositorioContato repositorioContato;
+        private readonly ITenantProvider tenantProvider;
 
-        public ContatoController(IRepositorioContato repositorioContato)
+        public ContatoController(IRepositorioContato repositorioContato, ITenantProvider tenantProvider)
         {
             this.repositorioContato = repositorioContato;
+            this.tenantProvider = tenantProvider;
         }
 
         [HttpGet]
@@ -61,7 +66,10 @@ namespace eAgenda.WebApp.Controllers
                 cadastrarVM.Cargo
             );
 
+            contato.UsuarioId = tenantProvider.UsuarioId.GetValueOrDefault();
+
             repositorioContato.CadastrarRegistro(contato);
+
 
             return RedirectToAction(nameof(Index));
         }

@@ -1,20 +1,25 @@
-﻿using eAgenda.Dominio.ModuloTarefa;
+﻿using eAgenda.Dominio.ModuloAutenticacao;
+using eAgenda.Dominio.ModuloTarefa;
 using eAgenda.Infraestrutura.Orm;
 using eAgenda.WebApp.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace eAgenda.WebApp.Controllers
 {
+    [Authorize]
     [Route("tarefas")]
     public class TarefaController : Controller
     {
         private readonly AppDbContext context;
         private readonly IRepositorioTarefa repositorioTarefa;
+        private readonly ITenantProvider tenantProvider;
 
-        public TarefaController(AppDbContext context, IRepositorioTarefa repositorioTarefa)
+        public TarefaController(AppDbContext context, IRepositorioTarefa repositorioTarefa, ITenantProvider tenantProvider)
         {
             this.context = context;
             this.repositorioTarefa = repositorioTarefa;
+            this.tenantProvider = tenantProvider;
         }
 
         [HttpGet]
@@ -64,6 +69,8 @@ namespace eAgenda.WebApp.Controllers
                 cadastrarVM.Titulo,
                 cadastrarVM.Prioridade
             );
+
+            tarefa.UsuarioId = tenantProvider.UsuarioId.GetValueOrDefault();
 
             repositorioTarefa.CadastrarRegistro(tarefa);
 

@@ -1,24 +1,28 @@
-﻿using eAgenda.Dominio.ModuloCompromisso;
+﻿using eAgenda.Dominio.ModuloAutenticacao;
+using eAgenda.Dominio.ModuloCompromisso;
 using eAgenda.Dominio.ModuloContato;
 using eAgenda.WebApp.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace eAgenda.WebApp.Controllers
 {
+    [Authorize]
     [Route("compromissos")]
     public class CompromissoController : Controller
     {
         private readonly IRepositorioCompromisso repositorioCompromisso;
         private readonly IRepositorioContato repositorioContato;
-
+        private readonly ITenantProvider tenantProvider;
         public CompromissoController(
             IRepositorioCompromisso repositorioCompromisso,
-            IRepositorioContato repositorioContato
+            IRepositorioContato repositorioContato, ITenantProvider tenantProvider
         )
         {
             this.repositorioCompromisso = repositorioCompromisso;
             this.repositorioContato = repositorioContato;
+            this.tenantProvider = tenantProvider;
         }
 
         [HttpGet]
@@ -71,6 +75,8 @@ namespace eAgenda.WebApp.Controllers
                 cadastrarVM.Link,
                 contatoSelecionado
             );
+
+            compromisso.UsuarioId = tenantProvider.UsuarioId.GetValueOrDefault();
 
             repositorioCompromisso.CadastrarRegistro(compromisso);
 
