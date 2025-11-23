@@ -1,4 +1,6 @@
 using eAgenda.Infraestrutura.Arquivos;
+using eAgenda.Infraestrutura.Orm;
+using eAgenda.WebApp.Config;
 
 namespace eAgenda.WebApp;
 
@@ -8,12 +10,16 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        
-        builder.Services.AddCamadaInfraestruturaEmArquivo();
+        // Add services to the container.
+        builder.Services.AddCamadaInfraestruturaEmOrm(builder.Configuration);
+
+        builder.Services.AddIdentityProviderConfig();
 
         builder.Services.AddControllersWithViews();
 
         var app = builder.Build();
+
+        app.ApplyMigrations();
 
         // Configure the HTTP request pipeline.
         if (!app.Environment.IsDevelopment())
@@ -26,6 +32,8 @@ public class Program
         app.UseStaticFiles();
 
         app.UseRouting();
+
+        app.UseAuthentication();
 
         app.UseAuthorization();
 

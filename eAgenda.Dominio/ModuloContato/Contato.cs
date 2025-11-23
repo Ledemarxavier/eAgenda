@@ -23,6 +23,8 @@ namespace eAgenda.Dominio.ModuloContato
         }
 
 
+
+
         public Contato(string nome, string telefone, string email, string? empresa, string? cargo): this()
         {
             Id = Guid.NewGuid();    
