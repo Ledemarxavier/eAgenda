@@ -2,22 +2,22 @@
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 name: Build e Deploy - eAgenda MVC
 
-on: # Gatilho do fluxo de trabalho
+on:
   push:
     branches:
       - master
   workflow_dispatch:
 
 jobs:
-  build: # Compila o projeto e o publica em uma pasta raíz
+  build:
     runs-on: windows-latest
     permissions:
-      contents: read #This is required for actions/checkout
+      contents: read
 
     steps:
-      - uses: actions/checkout@v4 # Puxa os arquivos do repositório
+      - uses: actions/checkout@v4
 
-      - name: Set up .NET Core # Instala o .NET 8 na máquina executando o worflow
+      - name: Set up .NET Core
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.x'
@@ -26,13 +26,14 @@ jobs:
         run: dotnet build --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"
+        run: dotnet publish -c Release -o ./myapp
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: .net-app
-          path: ${{env.DOTNET_ROOT}}/myapp
+          path: ./myapp
+
   test:
     runs-on: windows-latest
     needs: build
@@ -51,10 +52,10 @@ jobs:
         run: dotnet test --configuration Release --verbosity normal
         env:
           ASPNET_ENVIRONMENT: "STAGING"
+
   migrate:
     runs-on: windows-latest
     needs: [build, test]
-
     permissions:
       contents: read
 
@@ -68,7 +69,7 @@ jobs:
           dotnet-version: '8.x'
 
       - name: Install EF Core CLI
-        run: dotnet tool install --global dotnet-ef
+        run: dotnet tool install --global dotnet-ef --version 8.*
 
       - name: Apply EF Core migrations
         run: dotnet ef database update --project ./eAgenda.Infraestrutura.Orm --startup-project ./eAgenda.WebApp
@@ -79,10 +80,9 @@ jobs:
     runs-on: windows-latest
     needs: [build, test, migrate]
     permissions:
-      id-token: write #This is required for requesting the JWT
-      contents: read #This is required for actions/checkout
-      
-
+      id-token: write
+      contents: read
+       
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
@@ -103,4 +103,3 @@ jobs:
           app-name: 'eAgenda-ledemar-2025'
           slot-name: 'Production'
           package: .
-          
