@@ -47,6 +47,13 @@ namespace eAgenda.WebApp.Controllers
                 return View(registroVm);
             }
 
+            await signInManager.PasswordSignInAsync(
+            registroVm.Email,
+            registroVm.Senha,
+            isPersistent: true,
+            lockoutOnFailure: false
+        );
+
             return RedirectToAction(nameof(HomeController.Index), "Home");
         }
 
