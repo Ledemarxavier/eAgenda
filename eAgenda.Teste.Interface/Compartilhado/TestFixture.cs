@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace eAgenda.Teste.Interface.ModuloAutenticacao
+namespace eAgenda.Teste.Interface.Compartilhado
 {
     [TestClass]
     public abstract class TestFixture
@@ -62,7 +62,34 @@ namespace eAgenda.Teste.Interface.ModuloAutenticacao
 
             webDriver.Manage().Cookies.DeleteAllCookies();
 
-            webDriverWait = new WebDriverWait(webDriver, TimeSpan.FromSeconds(5));
+            webDriverWait = new WebDriverWait(webDriver, TimeSpan.FromSeconds(15));
         }
+
+         protected void RegistrarEAutenticarUsuario()
+    {
+        webDriver?.Navigate().GoToUrl(Path.Combine(enderecoBase, "autenticacao", "registro"));
+
+        webDriverWait?
+            .Until(d => d.FindElement(By.CssSelector("input[data-se=inputEmail]")))
+            .SendKeys("teste@gmail.com");
+
+        webDriverWait?
+            .Until(d => d.FindElement(By.CssSelector("input[data-se=inputSenha]")))
+            .SendKeys("Teste@123");
+
+        webDriverWait?
+            .Until(d => d.FindElement(By.CssSelector("input[data-se=inputConfirmarSenha]")))
+            .SendKeys("Teste@123");
+
+        webDriverWait?
+           .Until(d => d.FindElement(By.CssSelector("button[data-se=btnConfirmar]")))
+           .Click();
+
+        webDriverWait?
+            .Until(d => d.PageSource.Contains("Página Inicial"));
+
+        webDriverWait?
+            .Until(d => d.PageSource.Contains("teste@gmail.com"));
+    }
     }
 }

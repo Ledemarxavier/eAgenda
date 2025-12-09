@@ -1,8 +1,8 @@
-﻿using eAgenda.Teste.Interface.ModuloAutenticacao;
+﻿using eAgenda.Teste.Interface.Compartilhado;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 
-namespace eAgenda.Teste.Interface
+namespace eAgenda.Teste.Interface.ModuloAutenticacao
 {
     [TestClass]
     [TestCategory("Testes de Interface de Autenticação")]
