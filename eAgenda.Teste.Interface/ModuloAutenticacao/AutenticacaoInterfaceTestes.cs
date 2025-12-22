@@ -11,26 +11,22 @@ namespace eAgenda.Teste.Interface.ModuloAutenticacao
         [TestMethod]
         public void Deve_Registrar_Usuario_Corretamente()
         {
-            webDriver?.Navigate().GoToUrl(Path.Combine(enderecoBase, "autenticacao", "registro"));
+            NavegarPara("/autenticacao/registro");
 
-            webDriverWait?
-            .Until(d => d.FindElement(By.CssSelector("input[data-se=inputEmail]")))
+            EsperarPorElemento(By.CssSelector("input[data-se=inputEmail]"))
                 .SendKeys("teste@gmail.com");
 
-            webDriverWait?
-            .Until(d => d.FindElement(By.CssSelector("input[data-se=inputSenha]")))
+            EsperarPorElemento(By.CssSelector("input[data-se=inputSenha]"))
                 .SendKeys("Teste@123");
 
-            webDriverWait?
-            .Until(d => d.FindElement(By.CssSelector("input[data-se=inputConfirmarSenha]")))
-                .SendKeys("Teste@123");
+            EsperarPorElemento(By.CssSelector("input[data-se=inputConfirmarSenha]"))
+                 .SendKeys("Teste@123");
+
+            EsperarPorElemento(By.CssSelector("button[data-se=btnConfirmar]"))
+            .Click();
 
             webDriverWait?
-           .Until(d => d.FindElement(By.CssSelector("button[data-se=btnConfirmar]")))
-           .Click();
-
-            webDriverWait?
-                .Until(d => d.PageSource.Contains("Página Inicial"));
+                .Until(d => d.Title.Contains("Página Inicial"));
 
             webDriverWait?
             .Until(d => d.PageSource.Contains("teste@gmail.com"));
@@ -40,39 +36,39 @@ namespace eAgenda.Teste.Interface.ModuloAutenticacao
         public void Deve_Autenticar_Usuario_Corretamente()
         {
             // Arranjo
-            webDriver?.Navigate().GoToUrl(Path.Combine(enderecoBase, "autenticacao", "registro"));
+            NavegarPara("/autenticacao/registro");
 
             webDriverWait?
             .Until(d => d.FindElement(By.CssSelector("input[data-se=inputEmail]")))
                 .SendKeys("teste@gmail.com");
 
-            webDriverWait?
-            .Until(d => d.FindElement(By.CssSelector("input[data-se=inputSenha]")))
-            .SendKeys("Teste@123");
+            EsperarPorElemento(By.CssSelector("input[data-se=inputSenha]"))
+                .SendKeys("Teste@123");
+
+            EsperarPorElemento(By.CssSelector("input[data-se=inputConfirmarSenha]"))
+                .SendKeys("Teste@123");
+
+            EsperarPorElemento(By.CssSelector("button[data-se=btnConfirmar]"))
+                .Click();
 
             webDriverWait?
-           .Until(d => d.FindElement(By.CssSelector("input[data-se=inputConfirmarSenha]")))
-           .SendKeys("Teste@123");
+                .Until(d => d.Title.Contains("Página Inicial"));
 
-            webDriverWait?
-           .Until(d => d.FindElement(By.CssSelector("button[data-se=btnConfirmar]")))
-               .Click();
-
-            webDriver?.Navigate().GoToUrl(Path.Combine(enderecoBase, "autenticacao", "login"));
+            NavegarPara("/autenticacao/login");
 
             // Ação
-            webDriverWait?
-            .Until(d => d.FindElement(By.CssSelector("input[data-se=inputEmail]"))).SendKeys("teste@gmail.com");
+            EsperarPorElemento(By.CssSelector("input[data-se=inputEmail]"))
+                .SendKeys("teste@gmail.com");
 
-            webDriverWait?
-            .Until(d => d.FindElement(By.CssSelector("input[data-se=inputSenha]"))).SendKeys("Teste@123");
+            EsperarPorElemento(By.CssSelector("input[data-se=inputSenha]"))
+                .SendKeys("Teste@123");
 
-            webDriverWait?
-            .Until(d => d.FindElement(By.CssSelector("button[data-se=btnConfirmar]"))).Click();
+            EsperarPorElemento(By.CssSelector("button[data-se=btnConfirmar]"))
+                .Click();
 
             // Asserção
             webDriverWait?
-            .Until(d => d.PageSource.Contains("teste@gmail.com"));
+           .Until(d => d.Title.Contains("Página Inicial"));
         }
     }
 }

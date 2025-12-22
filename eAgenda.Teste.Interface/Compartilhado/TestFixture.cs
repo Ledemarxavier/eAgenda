@@ -1,4 +1,5 @@
 ﻿using eAgenda.Infraestrutura.Orm;
+using Microsoft.Extensions.DependencyInjection;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
@@ -13,29 +14,67 @@ namespace eAgenda.Teste.Interface.Compartilhado
     [TestClass]
     public abstract class TestFixture
     {
+        public TestContext TestContext { get; set; } = null!;
+
+        protected static SeleniumWebApplicationFactory serverFactory;
         protected static WebDriver? webDriver;
         protected static WebDriverWait? webDriverWait;
         protected static AppDbContext? dbContext;
-        protected string enderecoBase = "https://localhost:7255";
+        protected static string enderecoBase = null!;
 
         [AssemblyInitialize]
         public static void ConfigurarTestFixture(TestContext testContext)
         {
-            dbContext = AppDbContextFactory.CriarDbContext("Data Source=(LocalDB)\\MSSQLLocalDB;Initial Catalog=eAgendaTestDb;Integrated Security=True");
+            serverFactory = new SeleniumWebApplicationFactory();
 
-            webDriver = new ChromeDriver();
+            dbContext = serverFactory.Servicos.GetRequiredService<AppDbContext>();
+
+            enderecoBase = serverFactory.UrlKestrel;
+
+            ChromeOptions chromeOptions = new ChromeOptions();
+
+            // Se estiver no GitHub Actions (CI não está vazia)
+            if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("CI")))
+            {
+                chromeOptions.AddArguments(
+                    "--headless",              // Sem interface gráfica
+                    "--no-sandbox",            // Necessário para Docker/CI
+                    "--disable-dev-shm-usage", // Evita problemas de memória
+                    "--disable-gpu",           // Desabilita GPU
+                    "--window-size=1920,1080", // Resolução fixa
+                    "--lang=pt-BR"             // Configura cultura do navegador fixa
+                );
+            }
+            else
+            {
+                chromeOptions.AddArgument("--start-fullscreen");
+            }
+
+            webDriver = new ChromeDriver(chromeOptions);
         }
 
         [AssemblyCleanup]
         public static void LimparAmbiente()
         {
-            if (webDriver is null || dbContext is null) return;
+            if (webDriver is not null)
+            {
+                webDriver.Quit();
+                webDriver.Dispose();
+                webDriver = null;
+            }
 
+            if (dbContext is not null)
+            {
+                dbContext.Database.EnsureDeleted();
+                dbContext.Dispose();
+                dbContext = null;
+            }
 
-            webDriver.Quit();
-            webDriver.Dispose();
-
-            dbContext.Database.EnsureDeleted();
+            if (serverFactory is not null)
+            {
+                serverFactory?.Dispose();
+                serverFactory = null;
+            }
         }
 
         [TestInitialize]
@@ -62,34 +101,82 @@ namespace eAgenda.Teste.Interface.Compartilhado
 
             webDriver.Manage().Cookies.DeleteAllCookies();
 
-            webDriverWait = new WebDriverWait(webDriver, TimeSpan.FromSeconds(15));
+            webDriverWait = new WebDriverWait(webDriver, TimeSpan.FromSeconds(5));
         }
 
-         protected void RegistrarEAutenticarUsuario()
-    {
-        webDriver?.Navigate().GoToUrl(Path.Combine(enderecoBase, "autenticacao", "registro"));
+        [TestCleanup]
+        public void EncerrarTeste()
+        {
+            if (TestContext.CurrentTestOutcome is not UnitTestOutcome.Failed)
+                return;
 
-        webDriverWait?
-            .Until(d => d.FindElement(By.CssSelector("input[data-se=inputEmail]")))
-            .SendKeys("teste@gmail.com");
+            if (webDriver is null)
+                return;
 
-        webDriverWait?
-            .Until(d => d.FindElement(By.CssSelector("input[data-se=inputSenha]")))
-            .SendKeys("Teste@123");
+            try
+            {
+                Console.WriteLine("========== [DEBUG] ==========");
 
-        webDriverWait?
-            .Until(d => d.FindElement(By.CssSelector("input[data-se=inputConfirmarSenha]")))
-            .SendKeys("Teste@123");
+                Console.WriteLine($"Teste: {TestContext.TestName}");
+                Console.WriteLine($"Resultado: {TestContext.CurrentTestOutcome}");
+                Console.WriteLine($"Url da página atual: {webDriver.Url}");
+                Console.WriteLine($"Título da página atual: {webDriver.Title}");
 
-        webDriverWait?
-           .Until(d => d.FindElement(By.CssSelector("button[data-se=btnConfirmar]")))
-           .Click();
+                Console.WriteLine("---- PageSource ----");
+                Console.WriteLine(webDriver.PageSource);
 
-        webDriverWait?
-            .Until(d => d.PageSource.Contains("Página Inicial"));
+                Console.WriteLine("========== [FIM DO DEBUG] ==========");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[DEBUG] Erro ao coletar evidências: {ex}");
+            }
+        }
 
-        webDriverWait?
-            .Until(d => d.PageSource.Contains("teste@gmail.com"));
-    }
+        protected void RegistrarEAutenticarUsuario()
+        {
+            webDriver?.Navigate().GoToUrl(Path.Combine(enderecoBase, "autenticacao", "registro"));
+
+            webDriverWait?
+                .Until(d => d.FindElement(By.CssSelector("input[data-se=inputEmail]")))
+                .SendKeys("teste@gmail.com");
+
+            webDriverWait?
+                .Until(d => d.FindElement(By.CssSelector("input[data-se=inputSenha]")))
+                .SendKeys("Teste@123");
+
+            webDriverWait?
+                .Until(d => d.FindElement(By.CssSelector("input[data-se=inputConfirmarSenha]")))
+                .SendKeys("Teste@123");
+
+            webDriverWait?
+               .Until(d => d.FindElement(By.CssSelector("button[data-se=btnConfirmar]")))
+               .Click();
+
+            webDriverWait?
+                .Until(d => d.PageSource.Contains("Página Inicial"));
+
+            webDriverWait?
+                .Until(d => d.PageSource.Contains("teste@gmail.com"));
+        }
+
+        protected static void NavegarPara(string caminhoRelativo)
+        {
+            var enderecoBaseUri = new Uri(enderecoBase);
+
+            var uri = new Uri(enderecoBaseUri, caminhoRelativo);
+
+            webDriver?.Navigate().GoToUrl(uri);
+        }
+
+        protected static IWebElement EsperarPorElemento(By localizador)
+        {
+            return webDriverWait!.Until(driver =>
+            {
+                var elemento = driver.FindElement(localizador);
+
+                return elemento.Displayed ? elemento : null;
+            });
+        }
     }
 }

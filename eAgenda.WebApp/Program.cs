@@ -4,46 +4,47 @@ using eAgenda.WebApp.Config;
 
 namespace eAgenda.WebApp;
 
-public class Program
-{
-    public static void Main(string[] args)
+
+    public class Program
     {
-        var builder = WebApplication.CreateBuilder(args);
-
-        // Add services to the container.
-        builder.Services.AddCamadaInfraestruturaEmOrm(builder.Configuration);
-
-        builder.Services.AddIdentityProviderConfig();
-
-        builder.Services.AddControllersWithViews();
-
-        var app = builder.Build();
-
-        if (app.Environment.IsDevelopment())
+        public static void Main(string[] args)
         {
-            app.ApplyMigrations();
+            var builder = WebApplication.CreateBuilder(args);
+
+            // Add services to the container.
+            builder.Services.AddCamadaInfraestruturaEmOrm(builder.Configuration);
+
+            builder.Services.AddIdentityProviderConfig();
+
+            builder.Services.AddControllersWithViews();
+
+            var app = builder.Build();
+
+            if (app.Environment.IsDevelopment())
+            {
+                app.ApplyMigrations();
+            }
+
+            // Configure the HTTP request pipeline.
+            if (!app.Environment.IsDevelopment())
+            {
+                app.UseExceptionHandler("/Home/Erro");
+                app.UseHsts();
+            }
+
+            app.UseHttpsRedirection();
+            app.UseStaticFiles();
+
+            app.UseRouting();
+
+            app.UseAuthentication();
+
+            app.UseAuthorization();
+
+            app.MapControllerRoute(
+                name: "default",
+                pattern: "{controller=Home}/{action=Index}/{id?}");
+
+            app.Run();
         }
-
-        // Configure the HTTP request pipeline.
-        if (!app.Environment.IsDevelopment())
-        {
-            app.UseExceptionHandler("/Home/Erro");
-            app.UseHsts();
-        }
-
-        app.UseHttpsRedirection();
-        app.UseStaticFiles();
-
-        app.UseRouting();
-
-        app.UseAuthentication();
-
-        app.UseAuthorization();
-
-        app.MapControllerRoute(
-            name: "default",
-            pattern: "{controller=Home}/{action=Index}/{id?}");
-
-        app.Run();
     }
-}
