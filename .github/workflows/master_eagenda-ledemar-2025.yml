@@ -41,7 +41,13 @@ jobs:
       contents: read
 
     steps:
-      - uses: actions/checkout@v4
+      - name: "Checkout Code"
+        uses: actions/checkout@v4
+
+      - name: "Set up Chrome"
+        uses: browser-actions/setup-chrome@latest
+        with:
+          chrome-version: stable
      
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v4
@@ -51,7 +57,8 @@ jobs:
       - name: Run tests
         run: dotnet test --configuration Release --verbosity normal
         env:
-          ASPNET_ENVIRONMENT: "STAGING"
+          CI: true
+          ASPNET_ENVIRONMENT: "Testing"
 
   migrate:
     runs-on: windows-latest
