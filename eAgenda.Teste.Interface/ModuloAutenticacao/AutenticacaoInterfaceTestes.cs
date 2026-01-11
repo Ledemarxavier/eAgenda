@@ -17,10 +17,10 @@ namespace eAgenda.Teste.Interface.ModuloAutenticacao
                 .SendKeys("teste@gmail.com");
 
             EsperarPorElemento(By.CssSelector("input[data-se=inputSenha]"))
-                .SendKeys("Teste@123");
+                .SendKeys("SenhaSuperForteTeste@123");
 
             EsperarPorElemento(By.CssSelector("input[data-se=inputConfirmarSenha]"))
-                 .SendKeys("Teste@123");
+                 .SendKeys("SenhaSuperForteTeste@123");
 
             EsperarPorElemento(By.CssSelector("button[data-se=btnConfirmar]"))
             .Click();
@@ -43,10 +43,10 @@ namespace eAgenda.Teste.Interface.ModuloAutenticacao
                 .SendKeys("teste@gmail.com");
 
             EsperarPorElemento(By.CssSelector("input[data-se=inputSenha]"))
-                .SendKeys("Teste@123");
+                .SendKeys("SenhaSuperForteTeste@123");
 
             EsperarPorElemento(By.CssSelector("input[data-se=inputConfirmarSenha]"))
-                .SendKeys("Teste@123");
+                .SendKeys("SenhaSuperForteTeste@123");
 
             EsperarPorElemento(By.CssSelector("button[data-se=btnConfirmar]"))
                 .Click();
@@ -61,7 +61,7 @@ namespace eAgenda.Teste.Interface.ModuloAutenticacao
                 .SendKeys("teste@gmail.com");
 
             EsperarPorElemento(By.CssSelector("input[data-se=inputSenha]"))
-                .SendKeys("Teste@123");
+                .SendKeys("SenhaSuperForteTeste@123");
 
             EsperarPorElemento(By.CssSelector("button[data-se=btnConfirmar]"))
                 .Click();

@@ -143,11 +143,11 @@ namespace eAgenda.Teste.Interface.Compartilhado
 
             webDriverWait?
                 .Until(d => d.FindElement(By.CssSelector("input[data-se=inputSenha]")))
-                .SendKeys("Teste@123");
+                .SendKeys("SenhaSuperForteTeste@123");
 
             webDriverWait?
                 .Until(d => d.FindElement(By.CssSelector("input[data-se=inputConfirmarSenha]")))
-                .SendKeys("Teste@123");
+                .SendKeys("SenhaSuperForteTeste@123");
 
             webDriverWait?
                .Until(d => d.FindElement(By.CssSelector("button[data-se=btnConfirmar]")))
